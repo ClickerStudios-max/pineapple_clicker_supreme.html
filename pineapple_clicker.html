@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Pineapple Clicker SUPREME</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+margin:0;
+color:white;
+background:linear-gradient(270deg,#ffcc00,#ffaa00,#ffd966);
+background-size:600% 600%;
+animation:bg 12s infinite;
+}
+
+@keyframes bg{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+
+#pineapple{
+font-size:130px;
+cursor:pointer;
+transition:0.1s;
+}
+
+#pineapple:active{
+transform:scale(0.85);
+}
+
+#golden{
+position:absolute;
+font-size:80px;
+display:none;
+cursor:pointer;
+}
+
+.panel{
+background:rgba(0,0,0,0.45);
+padding:15px;
+width:420px;
+margin:10px auto;
+border-radius:10px;
+}
+
+button{
+padding:10px;
+margin:4px;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🍍 Pineapple Clicker SUPREME 🍍</h1>
+
+<h2>Pineapples: <span id="pine">0</span></h2>
+<h3>PPS: <span id="pps">0</span></h3>
+<h3>💎 Gems: <span id="gems">0</span></h3>
+
+<div id="pineapple">🍍</div>
+
+<div id="golden">👑🍍</div>
+
+<div class="panel">
+
+<h2>Buildings</h2>
+
+<button onclick="buy('worker')">Worker (<span id="workerCost">50</span>)</button>
+<button onclick="buy('farm')">Farm (<span id="farmCost">250</span>)</button>
+<button onclick="buy('factory')">Factory (<span id="factoryCost">1000</span>)</button>
+<button onclick="buy('lab')">Lab (<span id="labCost">5000</span>)</button>
+<button onclick="buy('kingdom')">Kingdom (<span id="kingdomCost">20000</span>)</button>
+<button onclick="buy('planet')">Planet (<span id="planetCost">100000</span>)</button>
+
+<p>Workers <span id="worker">0</span></p>
+<p>Farms <span id="farm">0</span></p>
+<p>Factories <span id="factory">0</span></p>
+<p>Labs <span id="lab">0</span></p>
+<p>Kingdoms <span id="kingdom">0</span></p>
+<p>Planets <span id="planet">0</span></p>
+
+</div>
+
+<div class="panel">
+
+<h2>Upgrades</h2>
+
+<button onclick="upgradeClick()">Click Upgrade (<span id="clickCost">100</span>)</button>
+<button onclick="prestige()">💎 Prestige (100k)</button>
+
+<p>Click Power <span id="clickPower">1</span></p>
+
+</div>
+
+<div class="panel">
+
+<h2>⚔ Boss</h2>
+
+<button onclick="spawnBoss()">Spawn Boss</button>
+<button onclick="attackBoss()">Attack</button>
+
+<p>Boss HP <span id="bossHP">0</span></p>
+
+</div>
+
+<script>
+
+let pine=0
+let gems=0
+let clickPower=1
+
+let bossHP=0
+
+let buildings={
+worker:{count:0,cost:50,pps:1},
+farm:{count:0,cost:250,pps:5},
+factory:{count:0,cost:1000,pps:20},
+lab:{count:0,cost:5000,pps:80},
+kingdom:{count:0,cost:20000,pps:300},
+planet:{count:0,cost:100000,pps:1000}
+}
+
+let clickCost=100
+
+function getPPS(){
+
+let total=0
+
+for(let b in buildings){
+total+=buildings[b].count*buildings[b].pps
+}
+
+return total*(1+gems*0.5)
+
+}
+
+function update(){
+
+document.getElementById("pine").innerText=Math.floor(pine)
+document.getElementById("pps").innerText=getPPS()
+document.getElementById("gems").innerText=gems
+
+document.getElementById("clickPower").innerText=clickPower
+document.getElementById("clickCost").innerText=clickCost
+
+document.getElementById("bossHP").innerText=bossHP
+
+for(let b in buildings){
+
+document.getElementById(b).innerText=buildings[b].count
+document.getElementById(b+"Cost").innerText=buildings[b].cost
+
+}
+
+}
+
+document.getElementById("pineapple").onclick=function(){
+
+pine+=clickPower*(1+gems*0.5)
+update()
+
+}
+
+function buy(type){
+
+let b=buildings[type]
+
+if(pine>=b.cost){
+
+pine-=b.cost
+b.count++
+b.cost=Math.floor(b.cost*1.35)
+
+update()
+
+}
+
+}
+
+function upgradeClick(){
+
+if(pine>=clickCost){
+
+pine-=clickCost
+clickPower++
+clickCost=Math.floor(clickCost*1.8)
+
+update()
+
+}
+
+}
+
+setInterval(function(){
+
+pine+=getPPS()
+update()
+
+},1000)
+
+function prestige(){
+
+if(pine>=100000){
+
+gems+=Math.floor(pine/100000)
+
+pine=0
+
+for(let b in buildings){
+
+buildings[b].count=0
+buildings[b].cost=Math.floor(buildings[b].cost/1.35)
+
+}
+
+update()
+
+}
+
+}
+
+function spawnBoss(){
+
+bossHP=5000
+
+}
+
+function attackBoss(){
+
+if(bossHP>0){
+
+bossHP-=clickPower*10
+
+if(bossHP<=0){
+
+pine+=10000
+gems+=2
+
+}
+
+update()
+
+}
+
+}
+
+function spawnGolden(){
+
+let g=document.getElementById("golden")
+
+g.style.display="block"
+g.style.left=Math.random()*80+"%"
+g.style.top=Math.random()*80+"%"
+
+setTimeout(()=>g.style.display="none",5000)
+
+}
+
+document.getElementById("golden").onclick=function(){
+
+pine+=5000
+this.style.display="none"
+update()
+
+}
+
+setInterval(spawnGolden,20000)
+
+function save(){
+
+localStorage.setItem("pineSupreme",JSON.stringify({pine,gems,buildings,clickPower,clickCost}))
+
+}
+
+function load(){
+
+let s=JSON.parse(localStorage.getItem("pineSupreme"))
+
+if(s){
+
+pine=s.pine
+gems=s.gems
+buildings=s.buildings
+clickPower=s.clickPower
+clickCost=s.clickCost
+
+}
+
+}
+
+setInterval(save,5000)
+
+load()
+update()
+
+</script>
+
+</body>
+</html>
